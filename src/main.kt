@@ -4,12 +4,12 @@ import java.util.regex.PatternSyntaxException
 /**
  * Sends file content to the API and checks if it contains red flags.
  */
-fun checkFileWithApi(endpoint: String, apiKey: String, prompt: String, content: String, keyword: String): Boolean {
+fun checkFileWithApi(endpoint: String, apiKey: String, prompt: String, content: String, keywordRegex: Regex): Boolean {
   val fullPrompt = "$prompt:\n$content"
 
   val response = getResponse(fullPrompt, endpoint, apiKey)
   if (response != null) {
-    val keywordFound = containsKeyword(response, keyword)
+    val keywordFound = containsKeyword(response, keywordRegex)
     if (keywordFound) {
       println("Response:\n$response")
     }
@@ -19,7 +19,7 @@ fun checkFileWithApi(endpoint: String, apiKey: String, prompt: String, content: 
   }
 }
 
-private fun containsKeyword(response: String, keyword: String) = response.split("\n").last().contains(keyword, ignoreCase = true)
+private fun containsKeyword(response: String, keywordRegex: Regex) = keywordRegex.containsMatchIn(response.split("\n").last())
 
 fun trimThink(s: String): String {
   return s.replace("<think>(.*)</think>".toRegex(RegexOption.DOT_MATCHES_ALL), "$1")
@@ -57,7 +57,7 @@ fun main(args: Array<String>) {
   val endpoint = args[1]
   val apiKey = args[2]
   val prompt = args[3]
-  val keyword = args[4]
+  val keyword = "\\b\\s*${args[4]}\\s*\\b"
   val pattern = args[5]
 
   // Validate regex pattern
@@ -68,12 +68,19 @@ fun main(args: Array<String>) {
     return
   }
 
+  val keywordRegex = try {
+    Regex(keyword, RegexOption.IGNORE_CASE)
+  } catch (e: PatternSyntaxException) {
+    println("Invalid regex pattern: ${e.message}")
+    return
+  }
+
   val filesWithRedFlags = mutableListOf<String>()
 
   traverseDirectory(rootDir, regex) { file ->
     try {
       val content = file.name + "\n" + file.readText(Charsets.UTF_8)
-      if (checkFileWithApi(endpoint, apiKey, prompt, content, keyword)) {
+      if (checkFileWithApi(endpoint, apiKey, prompt, content, keywordRegex)) {
         filesWithRedFlags.add(file.path)
       }
     } catch (e: Exception) {
