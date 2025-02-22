@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="treeChecker:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/treeChecker_jar</output-path>
+    <root id="archive" name="treeChecker.jar">
+      <element id="module-output" name="treeChecker" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/json/json/20250107/json-20250107.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib/2.1.10/kotlin-stdlib-2.1.10.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/annotations/13.0/annotations-13.0.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
